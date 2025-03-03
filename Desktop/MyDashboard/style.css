@@ -1,0 +1,71 @@
+*{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: rgb(192, 192, 192);
+}
+a{
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgb(97, 96, 95);
+}
+header{
+    background-color: white;
+    box-shadow: 1px 1px 5px rgb(192, 192, 192);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+}
+header > nav > a{
+    text-decoration: none;
+    font-size: 15px;
+    margin: 5px;
+    color: black;
+    background-color: rgb(230, 227, 227);
+    border-radius: 10px;
+    padding: 10px;
+}
+header > nav > a:hover{
+    background-color: rgb(194, 194, 194);
+}
+.content-body{
+   background-color: white;
+   height: 75vh;
+   margin-top: 2rem;
+   display: flex;
+}
+.content-body > .perfil{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 2rem 0 0.5rem;
+}
+.content-body > .perfil > img{
+    width: 200px;
+    border-radius: 20rem;
+}
+table{
+    width: 75vw;
+}
+th, td{
+    text-align: center;
+    border: 1px solid gray;
+}
+.destaques{
+    display: flex;
+    flex-direction: column;
+}
+.destaques > a{
+    margin-bottom: 1.5rem;
+}
+.biblioteca{
+    display: flex;
+}
+#pdf-frame{
+    margin-left: 2rem;
+}

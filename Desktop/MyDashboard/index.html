@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>My Dashboard</title>
+</head>
+<body>
+    <header>
+        <div class="welcome">
+            <h3>Hi Ynara! Welcome</h3>
+        </div>
+        <!--<nav>
+            <a href="/estudos/index.html">Estudos</a>
+            <a href="/praticas/index.html">Prática</a>
+            <a href="/projetos/index.html">Projetos</a>
+        </nav>-->
+    </header>
+
+    <div class="content-body">
+        <div class="perfil">
+            <img src="assets/images/user.jpg" alt="Imagem de perfil do usuario">
+            <div class="card-body">
+                <h3>Ynara dev</h3>
+            </div>
+        </div>
+        <div class="dashboard">
+            <h3>Dashboard</h3>
+
+                <table class="cronograma">
+                    <thead>
+                        <th>Segunda</th>
+                        <th>Terca</th>
+                        <th>Quarta</th>
+                        <th>Quinta</th>
+                        <th>Sexta</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Algoritmos</td>
+                            <td>Ler livro de Algoritmos</td>
+                            <td>AWS</td>
+                            <td>Lógica</td>
+                            <td>Arquitetura</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="destaques">
+                    <h3>Links importantes</h3>
+                    <a href="https://leetcode.com/" target="_blank">LeetCode</a>
+                    <a href="https://judge.beecrowd.com/pt" target="_blank">Beecrowd</a>
+
+                    
+                       <h3>Biblioteca</h3>
+                       <div class="biblioteca">
+                       <a href="assets/livros/Entendendo algoritmos.pdf" target="pdf-frame">Entendendo algotimos</a>
+                       <iframe id="pdf-frame" src="" width="70%" height="600px" style="display: none;"></iframe>
+                    </div>
+                </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    document.querySelector('a[target="pdf-frame"]').addEventListener('click', function (event) {
+        event.preventDefault();
+        const iframe = document.getElementById('pdf-frame');
+        if (iframe.style.display === 'none' || iframe.style.display === '') {
+           iframe.src = decodeURIComponent(this.href);
+           iframe.style.display = 'block'; 
+        }else{
+            iframe.style.display = 'none'; 
+        }
+    });
+</script>
