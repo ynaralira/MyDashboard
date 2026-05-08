@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualização API Renda Fixa</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        h1 { color: #2c3e50; }
+        h2 { margin-top: 32px; color: #34495e; }
+        label { display: block; margin-top: 8px; }
+        input, select { margin-bottom: 8px; padding: 4px; border-radius: 4px; border: 1px solid #bbb; }
+        button { margin-top: 8px; padding: 6px 16px; border-radius: 4px; border: none; background: #2980d9; color: #fff; cursor: pointer; }
+        button:hover { background: #1c5fa8; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; }
+        .flex { display: flex; gap: 40px; flex-wrap: wrap; }
+        .card { border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 16px; background: #fff; box-shadow: 0 2px 8px #0001; }
+        .table-scroll {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-width: 100vw;
+            max-height: 350px;
+            margin-bottom: 16px;
+            padding-bottom: 2px;
+        }
+        table { border-collapse: collapse; min-width: 700px; background: #fff; }
+        th, td { padding: 6px 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #e9ecef; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        em { color: #888; }
+    </style>
+</head>
+<body>
+    <h1>API de Renda Fixa - Visualização</h1>
+    <div class="flex">
+        <div class="card" style="flex:1; min-width:320px;">
+            <h2>Cadastrar Cliente</h2>
+            <form id="formCliente">
+                <label>Nome: <input type="text" id="nomeCliente" required></label>
+                <label>CPF: <input type="text" id="cpfCliente" required></label>
+                <label>Email: <input type="email" id="emailCliente" required></label>
+                <label>Perfil:
+                    <select id="perfilCliente" required>
+                        <option value="">Selecione...</option>
+                        <option value="conservador">Conservador</option>
+                        <option value="moderado">Moderado</option>
+                        <option value="arrojado">Arrojado</option>
+                    </select>
+                </label>
+                <button type="submit">Cadastrar</button>
+            </form>
+            <pre id="resCliente"></pre>
+        </div>
+        <div class="card" style="flex:2; min-width:320px;">
+            <h2>Clientes Cadastrados</h2>
+            <button onclick="listarClientes()">Atualizar lista</button>
+            <div id="clientes"></div>
+        </div>
+        <div class="card" style="flex:2; min-width:320px;">
+            <h2>Títulos Disponíveis</h2>
+            <button onclick="listarTitulos()">Listar todos</button>
+            <button onclick="listarTipos()">Listar tipos</button>
+            <div id="titulos"></div>
+            <pre id="tipos"></pre>
+        </div>
+    </div>
+    <div class="flex">
+        <div class="card" style="flex:1; min-width:320px;">
+            <h2>Alocar Título para Cliente</h2>
+            <form id="formAlocacao">
+                <label>Cliente:
+                    <select id="clienteSelect" required></select>
+                </label>
+                <label>Título:
+                    <select id="tituloSelect" required></select>
+                </label>
+                <label>Valor: <input type="number" id="valorAlocacao" required></label>
+                <button type="submit">Alocar</button>
+            </form>
+            <pre id="resAlocacao"></pre>
+        </div>
+        <div class="card" style="flex:2; min-width:320px;">
+            <h2>Alocações</h2>
+            <button onclick="listarAlocacoes()">Listar todas</button>
+            <div id="alocacoes"></div>
+        </div>
+    </div>
+    <script>
+    const api = 'http://localhost:8000';
+
+    function renderTable(data, columns) {
+        if (!Array.isArray(data) || data.length === 0) return '<em>Nenhum dado encontrado.</em>';
+        let thead = '<tr>' + columns.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
+        let tbody = data.map(row => '<tr>' + columns.map(c => `<td>${row[c.key] ?? ''}</td>`).join('') + '</tr>').join('');
+        return `<div class="table-scroll"><table>${thead}${tbody}</table></div>`;
+    }
+
+    function listarClientes() {
+        fetch(api + '/clientes/')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('clientes').innerHTML = renderTable(d, [
+                    {key: 'nome', label: 'Nome'},
+                    {key: 'cpf', label: 'CPF'}
+                ]);
+                
+                const select = document.getElementById('clienteSelect');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione...</option>' +
+                        d.map(c => `<option value="${c.id}">${c.nome} (${c.cpf})</option>`).join('');
+                }
+            });
+    }
+    document.getElementById('formCliente').onsubmit = function(e) {
+        e.preventDefault();
+        fetch(api + '/clientes/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nome: document.getElementById('nomeCliente').value,
+                cpf: document.getElementById('cpfCliente').value,
+                email: document.getElementById('emailCliente').value,
+                perfil: document.getElementById('perfilCliente').value
+            })
+        })
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('resCliente').textContent = JSON.stringify(d, null, 2);
+            listarClientes();
+        });
+    };
+    function listarTitulos() {
+        fetch(api + '/titulos/')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('titulos').innerHTML = renderTable(d, [
+                    {key: 'produto', label: 'Produto'},
+                    {key: 'emissor', label: 'Emissor'},
+                    {key: 'indexador', label: 'Indexador'},
+                    {key: 'taxa_portal', label: 'Taxa'},
+                    {key: 'vencimento', label: 'Vencimento'},
+                    {key: 'fonte', label: 'Fonte'}
+                ]);
+                const select = document.getElementById('tituloSelect');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione...</option>' +
+                        d.map(t => `<option value="${t.id}">${t.produto} - ${t.emissor} (${t.vencimento || ''})</option>`).join('');
+                }
+            });
+    }
+    function listarTipos() {
+        fetch(api + '/titulos/tipos')
+            .then(r => r.json())
+            .then(d => {
+                let html = '';
+                html += `<b>Total de títulos:</b> ${d.total}<br>`;
+                html += '<b>Produtos:</b> ';
+                html += '<ul>' + d.produtos.map(p => `<li>${p}</li>`).join('') + '</ul>';
+                html += '<b>Por fonte:</b>';
+                html += '<table class="table-scroll"><tr><th>Fonte</th><th>Quantidade</th></tr>' +
+                    Object.entries(d.por_fonte).map(([fonte, qtd]) => `<tr><td>${fonte}</td><td>${qtd}</td></tr>`).join('') + '</table>';
+                document.getElementById('tipos').innerHTML = html;
+            });
+    }
+    function listarAlocacoes() {
+        fetch(api + '/alocacoes/')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('alocacoes').innerHTML = renderTable(d, [
+                    {key: 'cliente_id', label: 'Cliente'},
+                    {key: 'titulo_id', label: 'Título'},
+                    {key: 'valor', label: 'Valor'},
+                    {key: 'emissor', label: 'Emissor'},
+                    {key: 'produto', label: 'Produto'},
+                    {key: 'indexador', label: 'Indexador'},
+                    {key: 'taxa_portal', label: 'Taxa'},
+                    {key: 'vencimento', label: 'Vencimento'}
+                ]);
+            });
+    }
+        document.getElementById('formAlocacao').onsubmit = function(e) {
+            e.preventDefault();
+            const clienteId = document.getElementById('clienteSelect').value;
+            const tituloId = document.getElementById('tituloSelect').value;
+            fetch(api + '/alocacoes/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente_id: Number(clienteId), titulo_id: Number(tituloId), valor: Number(document.getElementById('valorAlocacao').value) })
+            })
+            .then(async r => {
+                const d = await r.json();
+                if (!r.ok && d && d.detail && typeof d.detail === 'string') {
+                    document.getElementById('resAlocacao').textContent = d.detail;
+                    return;
+                }
+                document.getElementById('resAlocacao').textContent = JSON.stringify(d, null, 2);
+                listarAlocacoes();
+            });
+        };
+
+        window.onload = function() {
+            listarClientes();
+            listarTitulos();
+        };
+    </script>
+</body>
+</html>
